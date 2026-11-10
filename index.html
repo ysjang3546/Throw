@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>2D 무기 투척 배틀 아레나</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; touch-action: none; }
@@ -35,14 +35,14 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       z-index: 50; padding: 20px; overflow-y: auto;
     }
-    .lobby-header { text-align: center; margin-bottom: 20px; }
-    .gold-box { font-size: 24px; color: #facc15; font-weight: bold; margin-top: 6px; }
+    .lobby-header { text-align: center; margin-bottom: 16px; }
+    .gold-box { font-size: 24px; color: #facc15; font-weight: bold; margin-top: 4px; }
     .shop-container {
-      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 600px;
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 600px;
     }
     .shop-card {
       background: #1e293b; border: 2px solid #334155; border-radius: 12px;
-      padding: 12px; width: 120px; text-align: center; cursor: pointer;
+      padding: 10px; width: 110px; text-align: center; cursor: pointer;
       transition: all 0.2s;
     }
     .shop-card:hover { transform: translateY(-3px); border-color: #38bdf8; }
@@ -62,12 +62,13 @@
       display: flex; justify-content: space-between; align-items: center; pointer-events: none;
     }
     #hud * { pointer-events: auto; }
-    #exitBtn {
-      background: #dc2626; color: white; border: none; padding: 6px 14px;
-      border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 13px;
+    .top-btn {
+      background: #dc2626; color: white; border: none; padding: 6px 12px;
+      border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px;
     }
+    .fs-btn { background: #475569; margin-right: 6px; }
     #weaponNotice {
-      position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 48px; left: 50%; transform: translateX(-50%);
       background: rgba(0,0,0,0.6); padding: 4px 12px; border-radius: 20px; font-size: 12px;
       pointer-events: none;
     }
@@ -76,23 +77,23 @@
     #mobileControls {
       display: none; position: absolute; inset: 0; pointer-events: none;
     }
-    /* 가상 조이스틱 (왼쪽 아래) */
+    /* 가상 조이스틱 */
     #joystickZone {
-      position: absolute; bottom: 30px; left: 30px; width: 130px; height: 130px;
-      background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.3);
+      position: absolute; bottom: 30px; left: 24px; width: 120px; height: 120px;
+      background: rgba(255, 255, 255, 0.12); border: 2px solid rgba(255, 255, 255, 0.25);
       border-radius: 50%; pointer-events: auto; touch-action: none;
     }
     #joystickKnob {
-      position: absolute; top: 50%; left: 50%; width: 50px; height: 50px;
-      background: rgba(56, 189, 248, 0.7); border-radius: 50%;
+      position: absolute; top: 50%; left: 50%; width: 44px; height: 44px;
+      background: rgba(56, 189, 248, 0.75); border-radius: 50%;
       transform: translate(-50%, -50%); pointer-events: none;
     }
-    /* 투척 버튼 (오른쪽 아래) */
+    /* 투척 버튼 */
     #throwBtn {
-      position: absolute; bottom: 40px; right: 35px; width: 85px; height: 85px;
-      background: rgba(239, 68, 68, 0.75); border: 3px solid rgba(255, 255, 255, 0.6);
+      position: absolute; bottom: 36px; right: 28px; width: 80px; height: 80px;
+      background: rgba(239, 68, 68, 0.8); border: 3px solid rgba(255, 255, 255, 0.7);
       border-radius: 50%; display: flex; justify-content: center; align-items: center;
-      font-weight: bold; font-size: 18px; pointer-events: auto; touch-action: none;
+      font-weight: bold; font-size: 17px; pointer-events: auto; touch-action: none;
     }
     #throwBtn:active {
       background: rgba(220, 38, 38, 1); transform: scale(0.92);
@@ -115,14 +116,14 @@
   <div id="lobbyScreen">
     <div class="lobby-header">
       <h1 style="color:#38bdf8;">⚔️ WEAPON THROW .IO</h1>
-      <p id="greetingUser" style="margin-top:4px; font-size:16px;">환영합니다!</p>
+      <p id="greetingUser" style="margin-top:4px; font-size:15px;">환영합니다!</p>
       <div class="gold-box">🪙 <span id="lobbyGold">0</span> G</div>
     </div>
 
-    <h3 style="margin-bottom:10px; font-size:15px;">출격 무기 선택</h3>
+    <h3 style="margin-bottom:8px; font-size:14px;">출격 무기 선택</h3>
     <div class="shop-container" id="weaponShopList"></div>
 
-    <div style="margin-top: 18px;">
+    <div style="margin-top: 16px;">
       <button class="btn btn-green" onclick="enterGame()">전장 난입하기 (BATTLE)</button>
     </div>
   </div>
@@ -130,10 +131,13 @@
   <!-- 게임 화면 -->
   <div id="gameScreen">
     <div id="hud">
-      <div style="font-weight:bold; font-size:15px;">
-        HP: <span id="hpDisplay" style="color:#4ade80;">100</span> | 처치: <span id="killDisplay">0</span>
+      <div style="font-weight:bold; font-size:14px;">
+        HP: <span id="hpDisplay" style="color:#4ade80;">100</span> | K: <span id="killDisplay">0</span>
       </div>
-      <button id="exitBtn" onclick="leaveToLobby()">로비 (나가기)</button>
+      <div>
+        <button class="top-btn fs-btn" onclick="toggleFullScreen()">⛶ 전체화면</button>
+        <button class="top-btn" onclick="leaveToLobby()">로비 (나가기)</button>
+      </div>
     </div>
     <div id="weaponNotice">무기: <span id="equippedBadge" style="color:#facc15;">도끼</span></div>
     <canvas id="gameCanvas"></canvas>
@@ -192,434 +196,3 @@
     function saveAccount() {
       localStorage.setItem('weaponGameUser', JSON.stringify(userAccount));
     }
-
-    function renderLobby() {
-      document.getElementById('greetingUser').innerText = `전사: ${userAccount.name}`;
-      document.getElementById('lobbyGold').innerText = userAccount.gold;
-
-      const list = document.getElementById('weaponShopList');
-      list.innerHTML = '';
-      WEAPONS.forEach(w => {
-        const isUnlocked = userAccount.unlockedWeapons.includes(w.id);
-        const isEquipped = userAccount.equippedWeapon === w.id;
-
-        const card = document.createElement('div');
-        card.className = `shop-card ${isEquipped ? 'selected' : ''}`;
-        card.innerHTML = `
-          <div style="font-size:16px; font-weight:bold;">${w.name}</div>
-          <div style="font-size:11px; color:#94a3b8; margin:4px 0;">${w.desc}</div>
-          <div style="font-size:12px; font-weight:bold; color:${isUnlocked ? '#4ade80' : '#facc15'};">
-            ${isEquipped ? '장착 중' : isUnlocked ? '보유 중' : w.price + ' G'}
-          </div>
-        `;
-
-        card.onclick = () => {
-          if (isUnlocked) {
-            userAccount.equippedWeapon = w.id;
-            saveAccount();
-            renderLobby();
-          } else {
-            if (userAccount.gold >= w.price) {
-              userAccount.gold -= w.price;
-              userAccount.unlockedWeapons.push(w.id);
-              userAccount.equippedWeapon = w.id;
-              saveAccount();
-              renderLobby();
-            } else {
-              alert('골드가 부족합니다!');
-            }
-          }
-        };
-        list.appendChild(card);
-      });
-    }
-
-    // 인게임 시뮬레이션
-    let player = null;
-    let bots = [];
-    let projectiles = [];
-    let nextProjId = 1;
-    let isRunning = false;
-    let keys = { up: false, down: false, left: false, right: false };
-
-    // 가상 조이스틱 벡터 (-1.0 ~ 1.0)
-    let stickX = 0;
-    let stickY = 0;
-    let lastLookAngle = 0; // 스마트폰에서 이동하던 방향 기억
-
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-
-    // 모바일 기기 감지
-    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || ('ontouchstart' in window);
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-
-    function spawnBot(id) {
-      const weaponKeys = Object.keys(WEAPON_CONFIG);
-      const names = ['섀도우', '스톰', '발키리', '타이탄', '헌터', '블레이즈', '바이퍼'];
-      return {
-        id: 'bot_' + id,
-        name: '[BOT] ' + names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 90 + 10),
-        x: Math.random() * (MAP_SIZE - 200) + 100,
-        y: Math.random() * (MAP_SIZE - 200) + 100,
-        hp: 100,
-        maxHp: 100,
-        speed: 3.5,
-        weapon: weaponKeys[Math.floor(Math.random() * weaponKeys.length)],
-        lastShot: 0,
-        dirX: 0,
-        dirY: 0,
-        changeDirTimer: 0,
-        isBot: true
-      };
-    }
-
-    function enterGame() {
-      document.getElementById('lobbyScreen').style.display = 'none';
-      document.getElementById('gameScreen').style.display = 'block';
-
-      if (isMobile) {
-        document.getElementById('mobileControls').style.display = 'block';
-      }
-
-      const cur = WEAPONS.find(w => w.id === userAccount.equippedWeapon);
-      document.getElementById('equippedBadge').innerText = cur ? cur.name : '전투 도끼';
-
-      resizeCanvas();
-
-      player = {
-        id: 'player',
-        name: userAccount.name,
-        x: Math.random() * (MAP_SIZE - 400) + 200,
-        y: Math.random() * (MAP_SIZE - 400) + 200,
-        hp: 100,
-        maxHp: 100,
-        speed: 5.5,
-        weapon: userAccount.equippedWeapon || 'axe',
-        lastShot: 0,
-        kills: 0,
-        isBot: false
-      };
-
-      bots = [];
-      for (let i = 0; i < 20; i++) bots.push(spawnBot(i));
-      projectiles = [];
-      isRunning = true;
-    }
-
-    function leaveToLobby() {
-      isRunning = false;
-      document.getElementById('gameScreen').style.display = 'none';
-      document.getElementById('lobbyScreen').style.display = 'flex';
-      renderLobby();
-    }
-
-    // 1. PC 키보드 제어
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.up = true;
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.down = true;
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = true;
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = true;
-      if (e.key === 'Escape' && isRunning) leaveToLobby();
-    });
-
-    window.addEventListener('keyup', (e) => {
-      if (e.code === 'KeyW' || e.code === 'ArrowUp') keys.up = false;
-      if (e.code === 'KeyS' || e.code === 'ArrowDown') keys.down = false;
-      if (e.code === 'KeyA' || e.code === 'ArrowLeft') keys.left = false;
-      if (e.code === 'KeyD' || e.code === 'ArrowRight') keys.right = false;
-    });
-
-    // 2. PC 마우스 클릭 투척
-    canvas.addEventListener('mousedown', (e) => {
-      if (e.button !== 0 || !isRunning || !player) return;
-      const cameraX = player.x - canvas.width / 2;
-      const cameraY = player.y - canvas.height / 2;
-      fireWeapon(e.clientX + cameraX, e.clientY + cameraY);
-    });
-
-    // 3. 모바일 터치 제어 (가상 조이스틱)
-    const joyZone = document.getElementById('joystickZone');
-    const joyKnob = document.getElementById('joystickKnob');
-    let touchId = null;
-
-    joyZone.addEventListener('touchstart', (e) => {
-      const touch = e.changedTouches[0];
-      touchId = touch.identifier;
-      updateJoystick(touch.clientX, touch.clientY);
-    });
-
-    joyZone.addEventListener('touchmove', (e) => {
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        if (e.changedTouches[i].identifier === touchId) {
-          updateJoystick(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
-          break;
-        }
-      }
-    });
-
-    function resetJoystick() {
-      touchId = null;
-      stickX = 0;
-      stickY = 0;
-      joyKnob.style.transform = `translate(-50%, -50%)`;
-    }
-
-    joyZone.addEventListener('touchend', resetJoystick);
-    joyZone.addEventListener('touchcancel', resetJoystick);
-
-    function updateJoystick(cx, cy) {
-      const rect = joyZone.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const dx = cx - centerX;
-      const dy = cy - centerY;
-      const dist = Math.hypot(dx, dy);
-      const maxR = rect.width / 2;
-
-      if (dist === 0) {
-        stickX = 0; stickY = 0;
-      } else {
-        const clampedDist = Math.min(dist, maxR);
-        stickX = (dx / dist) * (clampedDist / maxR);
-        stickY = (dy / dist) * (clampedDist / maxR);
-        joyKnob.style.transform = `translate(calc(-50% + ${stickX * maxR}px), calc(-50% + ${stickY * maxR}px))`;
-        lastLookAngle = Math.atan2(stickY, stickX);
-      }
-    }
-
-    // 4. 모바일 투척 버튼 (바라보는 방향 또는 가까운 적에게 투척)
-    const throwBtn = document.getElementById('throwBtn');
-    throwBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      if (!isRunning || !player) return;
-
-      // 가까운 봇이 있으면 자동 조준, 없으면 조이스틱 방향으로 발사
-      let nearestBot = null;
-      let minD = 500;
-      bots.forEach(b => {
-        const d = Math.hypot(b.x - player.x, b.y - player.y);
-        if (d < minD) { minD = d; nearestBot = b; }
-      });
-
-      if (nearestBot) {
-        fireWeapon(nearestBot.x, nearestBot.y);
-      } else {
-        const tx = player.x + Math.cos(lastLookAngle) * 200;
-        const ty = player.y + Math.sin(lastLookAngle) * 200;
-        fireWeapon(tx, ty);
-      }
-    });
-
-    function fireWeapon(targetX, targetY) {
-      const now = Date.now();
-      const cfg = WEAPON_CONFIG[player.weapon] || WEAPON_CONFIG.axe;
-      if (now - player.lastShot < cfg.cooldown) return;
-      player.lastShot = now;
-
-      const dx = targetX - player.x;
-      const dy = targetY - player.y;
-      const dist = Math.hypot(dx, dy) || 1;
-
-      projectiles.push({
-        id: nextProjId++,
-        owner: player,
-        x: player.x,
-        y: player.y,
-        vx: (dx / dist) * cfg.speed,
-        vy: (dy / dist) * cfg.speed,
-        startX: player.x,
-        startY: player.y,
-        maxDist: cfg.maxDist,
-        damage: cfg.damage,
-        size: cfg.size,
-        weaponType: player.weapon,
-        color: cfg.color,
-        isReturn: false
-      });
-    }
-
-    // 메인 루프
-    function gameLoop() {
-      if (isRunning && player) {
-        // 이동 계산 (키보드 또는 조이스틱 합산)
-        let mx = 0, my = 0;
-        if (keys.up) my -= 1;
-        if (keys.down) my += 1;
-        if (keys.left) mx -= 1;
-        if (keys.right) mx += 1;
-        if (mx !== 0 && my !== 0) { mx *= 0.7071; my *= 0.7071; }
-
-        if (stickX !== 0 || stickY !== 0) {
-          mx = stickX;
-          my = stickY;
-        }
-
-        player.x = Math.max(30, Math.min(MAP_SIZE - 30, player.x + mx * player.speed));
-        player.y = Math.max(30, Math.min(MAP_SIZE - 30, player.y + my * player.speed));
-
-        document.getElementById('hpDisplay').innerText = Math.max(0, Math.floor(player.hp));
-        document.getElementById('killDisplay').innerText = player.kills;
-
-        // 봇 AI
-        const allTargets = [player, ...bots];
-        bots.forEach((b) => {
-          b.changeDirTimer--;
-          if (b.changeDirTimer <= 0) {
-            const angle = Math.random() * Math.PI * 2;
-            b.dirX = Math.cos(angle);
-            b.dirY = Math.sin(angle);
-            b.changeDirTimer = Math.floor(Math.random() * 60 + 30);
-          }
-          b.x = Math.max(30, Math.min(MAP_SIZE - 30, b.x + b.dirX * b.speed));
-          b.y = Math.max(30, Math.min(MAP_SIZE - 30, b.y + b.dirY * b.speed));
-
-          const now = Date.now();
-          const cfg = WEAPON_CONFIG[b.weapon];
-          if (now - b.lastShot > cfg.cooldown * 1.6) {
-            let nearest = null;
-            let minDist = 400;
-            allTargets.forEach(t => {
-              if (t.id === b.id) return;
-              const d = Math.hypot(t.x - b.x, t.y - b.y);
-              if (d < minDist) { minDist = d; nearest = t; }
-            });
-
-            if (nearest) {
-              b.lastShot = now;
-              const dx = nearest.x - b.x;
-              const dy = nearest.y - b.y;
-              const dist = Math.hypot(dx, dy) || 1;
-              projectiles.push({
-                id: nextProjId++,
-                owner: b,
-                x: b.x,
-                y: b.y,
-                vx: (dx / dist) * cfg.speed,
-                vy: (dy / dist) * cfg.speed,
-                startX: b.x,
-                startY: b.y,
-                maxDist: cfg.maxDist,
-                damage: cfg.damage,
-                size: cfg.size,
-                weaponType: b.weapon,
-                color: cfg.color,
-                isReturn: false
-              });
-            }
-          }
-        });
-
-        // 투사체 이동 및 충돌 판정
-        for (let i = projectiles.length - 1; i >= 0; i--) {
-          const p = projectiles[i];
-          p.x += p.vx;
-          p.y += p.vy;
-
-          if (p.weaponType === 'boomerang') {
-            const trav = Math.hypot(p.x - p.startX, p.y - p.startY);
-            if (trav > p.maxDist) p.isReturn = true;
-            if (p.isReturn && p.owner) {
-              const dx = p.owner.x - p.x;
-              const dy = p.owner.y - p.y;
-              const d = Math.hypot(dx, dy) || 1;
-              p.vx = (dx / d) * 15;
-              p.vy = (dy / d) * 15;
-              if (d < 25) { projectiles.splice(i, 1); continue; }
-            }
-          } else if (Math.hypot(p.x - p.startX, p.y - p.startY) > p.maxDist) {
-            projectiles.splice(i, 1);
-            continue;
-          }
-
-          let hit = false;
-          for (let t of allTargets) {
-            if (t.id === p.owner.id) continue;
-            if (Math.hypot(t.x - p.x, t.y - p.y) < p.size + 20) {
-              t.hp -= p.damage;
-              hit = true;
-              if (t.hp <= 0) {
-                if (p.owner.id === 'player') {
-                  player.kills++;
-                  userAccount.gold += 50;
-                  saveAccount();
-                }
-                if (t.isBot) {
-                  const bIdx = bots.findIndex(b => b.id === t.id);
-                  if (bIdx !== -1) bots[bIdx] = spawnBot(bIdx);
-                } else {
-                  alert('전사했습니다! 로비로 복귀합니다.');
-                  leaveToLobby();
-                }
-              }
-              break;
-            }
-          }
-          if (hit) projectiles.splice(i, 1);
-        }
-
-        // 화면 렌더링
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const camX = player.x - canvas.width / 2;
-        const camY = player.y - canvas.height / 2;
-
-        ctx.save();
-        ctx.translate(-camX, -camY);
-
-        // 맵 테두리 & 배경 격자
-        ctx.strokeStyle = '#1e293b';
-        ctx.lineWidth = 2;
-        for (let x = 0; x < MAP_SIZE; x += 100) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_SIZE); ctx.stroke();
-        }
-        for (let y = 0; y < MAP_SIZE; y += 100) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_SIZE, y); ctx.stroke();
-        }
-        ctx.strokeStyle = '#ef4444';
-        ctx.lineWidth = 6;
-        ctx.strokeRect(0, 0, MAP_SIZE, MAP_SIZE);
-
-        // 투사체 그리기
-        projectiles.forEach(p => {
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        // 엔티티 그리기
-        [...bots, player].forEach(e => {
-          ctx.fillStyle = e.id === 'player' ? '#38bdf8' : '#94a3b8';
-          ctx.beginPath();
-          ctx.arc(e.x, e.y, 22, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.lineWidth = 3;
-          ctx.strokeStyle = '#ffffff';
-          ctx.stroke();
-
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 12px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(e.name, e.x, e.y - 30);
-
-          ctx.fillStyle = '#334155';
-          ctx.fillRect(e.x - 24, e.y - 24, 48, 6);
-          ctx.fillStyle = '#22c55e';
-          ctx.fillRect(e.x - 24, e.y - 24, 48 * Math.max(0, e.hp / e.maxHp), 6);
-        });
-
-        ctx.restore();
-      }
-      requestAnimationFrame(gameLoop);
-    }
-
-    initAccount();
-    gameLoop();
-  </script>
-</body>
-</html>
