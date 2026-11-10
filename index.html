@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>2D 무기 투척 배틀 아레나 .io</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* 1. 계정 생성 모달 */
+    #registerOverlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      display: flex; justify-content: center; align-items: center; z-index: 100;
+    }
+    .modal-card {
+      background: #1e293b; padding: 32px; border-radius: 16px; width: 340px;
+      border: 2px solid #38bdf8; text-align: center;
+    }
+    .modal-card input {
+      width: 100%; padding: 12px; margin: 16px 0; border-radius: 8px;
+      border: 1px solid #475569; background: #0f172a; color: white; font-size: 16px;
+    }
+
+    /* 2. 메인 로비 & 상점 */
+    #lobbyScreen {
+      position: fixed; inset: 0; background: #0b1120;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 50; padding: 20px;
+    }
+    .lobby-header { text-align: center; margin-bottom: 24px; }
+    .gold-box { font-size: 24px; color: #facc15; font-weight: bold; margin-top: 8px; }
+    .shop-container {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; max-width: 800px;
+    }
+    .shop-card {
+      background: #1e293b; border: 2px solid #334155; border-radius: 12px;
+      padding: 16px; width: 140px; text-align: center; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .shop-card:hover { transform: translateY(-4px); border-color: #38bdf8; }
+    .shop-card.selected { border-color: #4ade80; background: #064e3b; }
+    .btn {
+      padding: 12px 24px; font-size: 18px; font-weight: bold; border-radius: 8px;
+      border: none; cursor: pointer; transition: 0.2s;
+    }
+    .btn-green { background: #22c55e; color: white; }
+    .btn-green:hover { background: #16a34a; }
+    .btn-blue { background: #0284c7; color: white; }
+    .btn-red { background: #ef4444; color: white; }
+
+    /* 3. 게임 플레이 캔버스 및 UI */
+    #gameScreen { display: none; width: 100vw; height: 100vh; position: relative; }
+    canvas { display: block; width: 100%; height: 100%; background: #111827; }
+    #hud {
+      position: absolute; top: 16px; left: 16px; right: 16px;
+      display: flex; justify-content: space-between; align-items: center; pointer-events: none;
+    }
+    #hud * { pointer-events: auto; }
+    #exitBtn {
+      background: #dc2626; color: white; border: none; padding: 8px 18px;
+      border-radius: 6px; font-weight: bold; cursor: pointer;
+    }
+    #weaponNotice {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 20px; font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 계정 생성 (최초 1회) -->
+  <div id="registerOverlay" style="display: none;">
+    <div class="modal-card">
+      <h2>전사 등록</h2>
+      <p style="color:#94a3b8; font-size:13px; margin-top:4px;">닉네임은 계정에 영구 저장됩니다.</p>
+      <input type="text" id="regNameInput" placeholder="닉네임 입력 (2~8자)" maxlength="8">
+      <button class="btn btn-blue" style="width:100%;" onclick="registerAccount()">계정 생성</button>
+    </div>
+  </div>
+
+  <!-- 메인 로비 / 상점 -->
+  <div id="lobbyScreen">
+    <div class="lobby-header">
+      <h1 style="color:#38bdf8;">⚔️ WEAPON THROW .IO</h1>
+      <p id="greetingUser" style="margin-top:6px; font-size:18px;">환영합니다!</p>
+      <div class="gold-box">🪙 <span id="lobbyGold">0</span> G</div>
+    </div>
+
+    <h3 style="margin-bottom:12px;">출격 무기 선택 (게임 중 변경 불가)</h3>
+    <div class="shop-container" id="weaponShopList"></div>
+
+    <div style="margin-top: 24px; display:flex; gap:16px;">
+      <button class="btn btn-green" onclick="enterGame()">전장 난입하기 (BATTLE)</button>
+    </div>
+  </div>
+
+  <!-- 인게임 캔버스 -->
+  <div id="gameScreen">
+    <div id="hud">
+      <div style="font-weight:bold; font-size:18px;">
+        HP: <span id="hpDisplay" style="color:#4ade80;">100</span> | 처치: <span id="killDisplay">0</span>
+      </div>
+      <button id="exitBtn" onclick="leaveToLobby()">로비로 나가기 (ESC)</button>
+    </div>
+    <div id="weaponNotice">장착 무기: <span id="equippedBadge" style="color:#facc15;">도끼</span> (아케이드 내 무기 변경 불가)</div>
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
